@@ -3,13 +3,23 @@ import datetime
 from pubsub import pub
 import time
 import json
+import signal
+import sys
 # Variables initialization
 encoding = 'utf-8'
 i = 0
-interface = (
-    meshtastic.serial_interface.SerialInterface ()
-)
+interface = (meshtastic.serial_interface.SerialInterface ())
 receivedPackets = []
+os.makedirs("./data", exist_ok=True)
+def save_and_exit():
+  """ Exit signal handler function"""
+  print("\nStopped.")
+  with open('data/receivedPackets.json', 'w') as f:
+    json.dump(receivedPackets, f,indent=4)
+  interface.close()
+  sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler) # CTRL-C
+signal.signal(signal.SIGTERM , signal_handler) # systemd stop
 def onReceive(packet, interface) -> None:
   """Callback invoked when a packet arrives"""
   timestamp = str(datetime.datetime.now())
@@ -29,12 +39,6 @@ def onReceive(packet, interface) -> None:
       )
 # When we receive a text, run onReceive
 pub.subscribe(onReceive, "meshtastic.receive.text")
-print("Listening... Press Ctrl-C to stop")
 try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("\nStopped.")
-    with open('data/receivedPackets.json', 'w') as f:
-      json.dump(receivedPackets, f,indent=4)
-    interface.close()
+  while True:
+    time.sleep(1)

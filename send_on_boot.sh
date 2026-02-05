@@ -6,7 +6,7 @@ Description=Send Packets
 [Service]
 User=pi
 WorkingDirectory=/home/pi/Meshtastic-Experiments
-ExecStart=/home/pi/Meshtastic-Experiments/venv/bin/python /home/pi/Meshtastic-Experiments/send.py 2 5 ^all
+ExecStart=/home/pi/Meshtastic-Experiments/venv/bin/python /home/pi/Meshtastic-Experiments/send.py 20 !7aa01783
 Restart=no
 
 [Install]

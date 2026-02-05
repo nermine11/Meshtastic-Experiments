@@ -7,11 +7,10 @@ if(__name__ == "__main__"):
   nbPackets   = int(sys.argv[1])
   destination = sys.argv[2]
   # Variables initialization
+  os.makedirs("./data", exist_ok=True)
   encoding = 'utf-8'
   interface = (meshtastic.serial_interface.SerialInterface())
   sentLog = []
-  #nbPackets = 5
-  #destination = "!49242450" #"^all"
   # Sending loop
   for i in range(nbPackets):
     timestamp = str(datetime.datetime.now())
