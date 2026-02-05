@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import json
-
 import os
-
 results = []
 root_path = '/home/nelkilan/Carthago/Meshtastic_tests/tests'
 for dirpath, dirnames, filenames in os.walk(root_path):
@@ -30,9 +28,5 @@ for dirpath, dirnames, filenames in os.walk(root_path):
             "received": receivedCount
             }
         )
-
 with open('data/results.json', 'w') as f:
     json.dump(results, f,indent=4)
-
-
-

@@ -6,12 +6,9 @@ import sys
 if(__name__ == "__main__"):
   nbPackets   = int(sys.argv[1])
   destination = sys.argv[2]
-
   # Variables initialization
   encoding = 'utf-8'
-  interface = (
-      meshtastic.serial_interface.SerialInterface()
-      )
+  interface = (meshtastic.serial_interface.SerialInterface())
   sentLog = []
   #nbPackets = 5
   #destination = "!49242450" #"^all"

@@ -2,10 +2,7 @@ import meshtastic.serial_interface
 import datetime
 from pubsub import pub
 import time
-import matplotlib.pyplot as plt
-import numpy as np
 import json
-
 # Variables initialization
 encoding = 'utf-8'
 i = 0
