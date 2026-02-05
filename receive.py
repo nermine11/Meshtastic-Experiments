@@ -5,6 +5,7 @@ import time
 import json
 import signal
 import sys
+import os
 # Variables initialization
 encoding = 'utf-8'
 i = 0
