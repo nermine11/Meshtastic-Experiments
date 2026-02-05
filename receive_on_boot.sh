@@ -1,5 +1,5 @@
 # start sending packets in a loop on boot
-cat <<EOF | sudo tee /etc/systemd/system/send_packets.service
+cat <<EOF | sudo tee /etc/systemd/system/receive_on_boot.service
 [Unit]
 Description=Send Packets
 
@@ -13,13 +13,13 @@ Restart=no
 WantedBy=multi-user.target
 EOF
 
-cat <<EOF | sudo tee /etc/systemd/system/send_packets.timer
+cat <<EOF | sudo tee /etc/systemd/system/receive_on_boot.timer
 [Unit]
 Description=timer for Sending packets
 
 [Timer]
 OnBootSec=5min
-Unit=send_packets.service
+Unit=receive_on_boot.service
 
 [Install]
 WantedBy=timers.target
