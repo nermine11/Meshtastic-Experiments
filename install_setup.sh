@@ -14,6 +14,6 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install the Python packages needed inside the venv
-sudo venv/bin/pip install --upgrade python3-pip
+sudo venv/bin/pip install --upgrade pip
 sudo venv/bin/pip install --upgrade pytap2
 sudo venv/bin/pip install --upgrade "meshtastic[cli]"
