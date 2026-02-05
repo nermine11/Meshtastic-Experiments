@@ -19,8 +19,8 @@ def save_and_exit():
     json.dump(receivedPackets, f,indent=4)
   interface.close()
   sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler) # CTRL-C
-signal.signal(signal.SIGTERM , signal_handler) # systemd stop
+signal.signal(signal.SIGINT, save_and_exit) # CTRL-C
+signal.signal(signal.SIGTERM , save_and_exit) # systemd stop
 def onReceive(packet, interface) -> None:
   """Callback invoked when a packet arrives"""
   timestamp = str(datetime.datetime.now())
