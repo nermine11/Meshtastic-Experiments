@@ -39,6 +39,5 @@ def onReceive(packet, interface) -> None:
       )
 # When we receive a text, run onReceive
 pub.subscribe(onReceive, "meshtastic.receive.text")
-try:
-  while True:
-    time.sleep(1)
+while True:
+  time.sleep(1)
