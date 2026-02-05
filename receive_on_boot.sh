@@ -5,8 +5,8 @@ Description=Send Packets
 
 [Service]
 User=pi
-WorkingDirectory=/home/pi/Meshtastic
-ExecStart=/home/pi/Meshtastic/venv/bin/python /home/pi/Meshtastic/receive.py
+WorkingDirectory=/home/pi/Meshtastic-Experiments
+ExecStart=/home/pi/Meshtastic-Experiments/venv/bin/python /home/pi/Meshtastic-Experiments/receive.py
 Restart=no
 
 [Install]
