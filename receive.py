@@ -19,6 +19,7 @@ def save_and_exit():
     json.dump(receivedPackets, f,indent=4)
   interface.close()
   sys.exit(0)
+# Set the signal hanglers
 signal.signal(signal.SIGINT, save_and_exit) # CTRL-C
 signal.signal(signal.SIGTERM , save_and_exit) # systemd stop
 def onReceive(packet, interface) -> None:
@@ -26,9 +27,8 @@ def onReceive(packet, interface) -> None:
   timestamp = str(datetime.datetime.now())
   global i
   print(packet)
-  #put timestamp here
   if str(packet["decoded"]["payload"], encoding).startswith("test"):
-    # We only care about Test text packets
+    # We only care about "test" text packets
     i +=1
     receivedPackets.append({"i" : i,
         "destination": packet["to"],

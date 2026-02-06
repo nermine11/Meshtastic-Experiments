@@ -1,4 +1,4 @@
-# start sending packets in a loop on boot
+# start sending packets on boot
 cat <<EOF | sudo tee /etc/systemd/system/receive_on_boot.service
 [Unit]
 Description=Send Packets

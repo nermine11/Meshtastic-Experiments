@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import json
 import numpy as np
-
 with open('results.json', 'r') as file:
     results = json.load(file)
-
 sent = [r["sent"] for r in results]
 received = [r["received"] for r in results]
 print(sent)
