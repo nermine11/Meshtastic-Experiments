@@ -13,7 +13,7 @@ if(__name__ == "__main__"):
   interface = (meshtastic.serial_interface.SerialInterface())
   sentLog = []
   # Sending loop
-  for i in range(nbPackets):
+  for i in range(1, nbPackets + 1):
     timestamp = str(datetime.datetime.now())
     packet = interface.sendText(text = "test" + str(i) + " "+ timestamp,
                               destinationId=destination,
