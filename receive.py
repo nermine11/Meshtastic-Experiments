@@ -42,7 +42,8 @@ def onReceive(packet, interface) -> None:
         "payload" :  packet["decoded"]["text"] if packet["decoded"] else None #convert from byte string to character string
         }
       )
-# When we receive a text, run onReceive
-pub.subscribe(onReceive, "meshtastic.receive.text")
-while True:
-  time.sleep(1)
+if(__name__ == "__main__"):
+  # When we receive a text, run onReceive
+  pub.subscribe(onReceive, "meshtastic.receive.text")
+  while True:
+    time.sleep(1)
