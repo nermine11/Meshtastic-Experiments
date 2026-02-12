@@ -23,8 +23,6 @@ def save_logs():
 
 def save_and_exit(signal, frame):
   """ Exit signal handler function"""
-  # Wait 2 mins
-  #time.sleep(120)
   save_logs()
   interface.close()
   sys.exit(0)

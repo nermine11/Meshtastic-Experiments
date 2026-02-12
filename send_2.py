@@ -53,7 +53,7 @@ def onReceive(packet, interface) -> None:
   global j
   if not packet["decoded"]:
     return
-  if not packet["text"]:
+  if not packet["decoded"]["text"]:
     return
   if packet["decoded"]["text"].startswith("TX_DONE"):
     # We only care about "test" text packets
