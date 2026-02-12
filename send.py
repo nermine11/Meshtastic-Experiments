@@ -29,7 +29,7 @@ if(__name__ == "__main__"):
     timestamp = str(datetime.datetime.now())
     packet = interface.sendText(text = "test" + str(i) + " "+ timestamp,
                               destinationId=destination,
-                              wantAck=True
+                              wantAck=False
              )
     sentLog.append(
         {"i" : i,
@@ -40,9 +40,9 @@ if(__name__ == "__main__"):
           "payload" : str(packet.decoded.payload, encoding) if packet.decoded else None
           }
         )
-    time.sleep(3) # to check how much to sleep
-  #sleep 10 mins
-  time.sleep(600)
+    time.sleep(10) # to check how much to sleep
+  #sleep 2 mins
+  time.sleep(120)
   with open('./data/sentPackets.json', 'w') as f:
     json.dump(sentLog, f,indent=4)
   interface.close()
