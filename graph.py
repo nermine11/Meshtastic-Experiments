@@ -93,7 +93,7 @@ plt.show()
 # graph 4 : average RTT
 plt.figure()
 plt.bar(["disaster", "cycling"], [disasterRtt, cyclingRtt])
-plt.ylabel("Average RTT")
+plt.ylabel("Average RTT (ms)")
 plt.title("Average RTT per Scenario")
 plt.show()
 
