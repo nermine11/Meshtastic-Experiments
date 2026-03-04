@@ -1,12 +1,11 @@
 #!/bin/bash
 
 ##############################################################
-# This script has to be placed in /home/pi/Meshtastic
 ##############################################################
 
 # update
 sudo apt update
-sudo apt install -y python3-venv python3-numpy python3-matplotlib
+sudo apt install -y python3-venv 
 
 
 # install and activate the virtual environment
