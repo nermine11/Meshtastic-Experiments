@@ -15,7 +15,7 @@ NB_NODES                        = 6
 NODENUM_BROADCAST               = 0xffffffff
 HOUR                            = 3600
 STATS_INTERVAL                  = 300         #15 mins
-WAIT_PHASE_TIMEOUT              = 60          # safety timeout per state
+WAIT_PHASE_TIMEOUT              = 240          # safety timeout per state
 MAX_RETRIES                     = 1
 class State(Enum):
     IDLE                        = auto()  
@@ -60,7 +60,7 @@ class CollectorController():
         self.interface                      = meshtastic.serial_interface.SerialInterface()
         self.received_packets               = Queue()
         self.reset()
-        pub.subscribe(self.on_receive, "meshtastic.receive.text")
+        pub.subscribe(self.on_receive, "meshtastic.receive")
     
     #----------initialization-----------------------
     def reset(self):
@@ -82,54 +82,56 @@ class CollectorController():
                 if B == A:
                     continue
                 self.network_stats[A][B] = LinkStats()
+        """ -----------helper functions---------------"""
+    def convert_id_to_dec(self, id):
+        if(id.startswith("!")):
+            return int(id[1:], 16)
+        return id
+    
+    
     """ -----------Process incoming packets---------------"""
     def on_receive(self, packet, interface):
+        #print(packet)
         """Callback invoked when a packet arrives"""
-        if not(packet["decoded"]) or self.packet_is_text(packet):
+        portnum = packet["decoded"].get("portnum")
+        if not(packet["decoded"]) or portnum != "PRIVATE_APP":
+            #print("drop packet")
             return
         self.received_packets.put(packet)
 
-    def packet_is_text(self, packet):
-        """ check if packet is intended to another node so 
-        we don't save save it in the queue
-        """
-        print("packet is text")
-        text = packet["decoded"].get("text")
-        if not text:
-            return False
-        else:
-            return packet["decoded"]["text"].startswith("packet")
-
     def process_all_packets(self):
         """ Process all packets currently in the queue """
+        #print("process packets")
+        #print(self.received_packets)
         while not self.received_packets.empty():
             packet = self.received_packets.get()
+            print("packet in queue")
+            print(packet)
             self.process_packet(packet)
 
     def process_packet(self, packet):
         """ processes the packets by calling the corresponding function"""
         # we received stats_response
-        portnum = packet["decoded"].get("portnum")
-        if portnum != PortNum_PRIVATE_APP:
-            return
+        print(packet)
         payload = packet["decoded"].get("payload")
-        if(not payload or len(payload) != 1):
+        if(not payload or len(payload) < 1):
             return
         cmd = payload[0]
-        if cmd == Responses.PKGEN_CONFIG_RESP:
+        print(cmd)
+        if cmd == Responses.PKGEN_CONFIG_RESP.value:
             self.process_pkgen_response(packet)
-        elif cmd == Responses.CLEAR_STATS_RESP:
+        elif cmd == Responses.CLEAR_STATS_RESP.value:
             self.process_clear_stats_response(packet)
-        elif cmd == Responses.STATS_RESP:
+        elif cmd == Responses.STATS_RESP.value:
             print("got stats")
-            self.process_stats()
+            self.process_stats(packet)
         else:
             print("unknow cmd", cmd)
 
         
     def process_stats(self, packet):
         payload = packet["decoded"]["payload"]
-        A       = packet["fromId"]
+        A       = self.convert_id_to_dec(packet["fromId"])
         offset = 1
         self.sent_broadcasts[A] = int.from_bytes(payload[offset: offset + 4], 'little')
         offset +=4
@@ -139,18 +141,28 @@ class CollectorController():
             offset += 4
             if(node_id == A):
                 continue
+            # make sure the nested dictionary exists
+            if A not in self.network_stats:
+                self.network_stats[A] = {}
+            if node_id not in self.network_stats[A]:
+                self.network_stats[A][node_id] = LinkStats()
+                print(f"  ↳ Created new LinkStats entry")
             self.network_stats[A][node_id].sent_dms = int.from_bytes(payload[offset: offset + 4], 'little')
+            print(f"    sent_dms: {self.network_stats[A][node_id].sent_dms}")
             offset += 4
+                
             self.network_stats[A][node_id].received_dms = int.from_bytes(payload[offset: offset + 4], 'little')
+            print(f"    received_dms: {self.network_stats[A][node_id].received_dms}")
             offset += 4
+                
             self.network_stats[A][node_id].received_broadcasts = int.from_bytes(payload[offset: offset + 4], 'little')
+            print(f"    received_broadcasts: {self.network_stats[A][node_id].received_broadcasts}")
             offset += 4
+                
             self.network_stats[A][node_id].rtt = int.from_bytes(payload[offset: offset + 4], 'little')
+            print(f"    rtt: {self.network_stats[A][node_id].rtt}")
             offset += 4
-            print(self.network_stats[A][node_id].sent_dms)
-            print(self.network_stats[A][node_id].received_dms)
-            print(self.network_stats[A][node_id].received_broadcasts)
-            print(self.network_stats[A][node_id].rtt)
+        print("=== Stats processing complete ===\n")
 
 
     def process_stats_old(self, packet):
@@ -200,6 +212,7 @@ class CollectorController():
 
     def clear_stats_request(self, destination):
         """ Sends a clear_stats_request to all nodes"""
+        print("ask to clear")
         payload = bytes([Commands.CLEAR_STATS_REQ.value])
         self.interface.sendData(data = payload,
                 destinationId=destination,
@@ -304,23 +317,27 @@ class CollectorController():
             cleared their stats the previous round """
         # if all cleared nodes sent their stats
         if self.cleared_nodes.issubset(self.stats_responded_nodes):
+            print("ask to clear")
             self.handle_wait_stats(now)
             self.state = State.WAIT_STATS_CLEARED
             return
         #Not all nodes answered
         #so retry again asking for stats 
         if self.phase_timeout() and self.retries < MAX_RETRIES:
-            self.ask_for_stats(now)
+            print("retry asking for stats again")
+            #self.ask_for_stats(now)
             self.retries += 1
             return 
         #Move on with non finished data
         if self.retries >= MAX_RETRIES:
+            print(" done retrying for stats again, asking to clear")
             self.handle_wait_stats(now)
             self.state = State.WAIT_STATS_CLEARED
             return
 
     def handle_wait_stats_cleared_state(self, now):
         if self.stats_cleared_nodes == self.nodes:
+            print("clear")
             self.handle_wait_stats_cleared()
             self.mark_cleared(self.stats_cleared_nodes)
             self.state = State.IDLE 
@@ -328,14 +345,16 @@ class CollectorController():
         #Not all nodes answered
         #so retry again asking to clear stats 
         if self.phase_timeout() and self.retries < MAX_RETRIES:
-            self.clear_stats(now)
+            print("retry asking to clear again")
+            #self.clear_stats(now)
             self.retries += 1
             return
         #Move on with non finished data
         #mark responding nodes as cleared
         if self.retries >= MAX_RETRIES :
+            print("not all nodes cleared moving on")
             self.handle_wait_stats_cleared()
-            self.mark_cleared(self.stats_cleared_nodes)
+            #self.mark_cleared(self.stats_cleared_nodes)
             self.state = State.IDLE
             return 
 
@@ -346,8 +365,8 @@ class CollectorController():
         if self.state == State.IDLE:
             self.handle_idle_state(now)
         # waiting for pkgen_response from all nodes
-        elif self.state == State.WAIT_CONFIG:
-            self.handle_wait_config_state(now)
+        #elif self.state == State.WAIT_CONFIG:
+        #    self.handle_wait_config_state(now)
         # only wait for stats from previously cleared nodes
         elif self.state == State.WAIT_STATS:
             self.handle_wait_stats_state(now)
@@ -369,5 +388,5 @@ class CollectorController():
 """ ----------RUN---------------"""
 if(__name__ == "__main__"):
     collector = CollectorController()
-    collector.run()
+    collector.run()    
     #collector.pkgen_request()
