@@ -18,7 +18,7 @@ logging.basicConfig(
 # Variables initialization
 PortNum_PRIVATE_APP             = 256
 NODENUM_BROADCAST               = 0xffffffff
-RETRY_TIMEOUT                   = 10         # timeout to retry to check
+RETRY_TIMEOUT                   = 300         # timeout to retry to check
 MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
 NUMPKT                          = 100
@@ -218,7 +218,6 @@ class CollectorController():
         for node in destinations:
             logging.info("Resend clear request to 0x%x", node)
             self.send_clear_stats_request(node)
-
 
     def handle_wait_stats_cleared_state(self) -> bool:
         """ Handles the WAIT_STATS_CLEARED state """
