@@ -23,6 +23,7 @@ MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
 NUMPKT                          = 100
 PERIOD                          = 60
+STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 1800     
 CONTROLLER_NODE                 = 0x31c0c4f1
 LEADER_NODE                     = 0x59d388e5
 DISASTER_RESPONSE               = "disaster_response"
@@ -30,11 +31,12 @@ HIKING                          = "hiking"
 
 class State(Enum):
     IDLE                        = auto()
-    WAIT_PKGEN_RESP             = auto()
-    PKGEN_SENT                  = auto()
     WAIT_STATS_CLEARED          = auto()
+    WAIT_PKGEN_RESP             = auto()
+    ASK_FOR_STATS               = auto()
     WAIT_STATS_RESP             = auto()
     STATS_CLEARED               = auto()
+    WAIT_TO_ASK_FOR_STATS       = auto()
     SAVE_TO_JSON                = auto()
 
 class PacketType(Enum):
@@ -76,6 +78,7 @@ class CollectorController():
         self.received_packets                = Queue()
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
+        self.stats_timeout                   = 0
         self.retries                         = 0
         self.stats_cleared_nodes             = set()
         self.pkgen_responded_nodes           = set()
@@ -98,7 +101,7 @@ class CollectorController():
             return int(id[1:], 16)
         return id
 
-    # -----------SEND COMMANDS--------------------
+    # -----------------------SEND COMMANDS--------------------
     def send_clear_stats_request(self, destination: int) -> None:
         """ Sends a clear_stats_request to the destination"""
         payload = bytes([PacketType.STATS_CLEAR_REQ.value])
@@ -158,7 +161,7 @@ class CollectorController():
             portNum= PortNum_PRIVATE_APP,
             wantAck=False)
 
-    # ------------------------------------------------------PROCESS INCOMING PACKETS-------------------------------------------
+    # ----------------------PROCESS INCOMING PACKETS-------------------------------------------
     def on_receive(self, packet, interface) -> None:
         """Callback invoked when a packet arrives"""
         portnum = packet["decoded"].get("portnum")
@@ -207,9 +210,10 @@ class CollectorController():
 
     # ------------------------------------------------------Update Stats---------------------------------------------------
     """"""" ---------------CLEAR STATS-----------------"""""""""
-    def clear_stats_broadcast(self) -> None:
+    def send_clear_stats_to_all(self) -> None:
         """ Sends request to clear the stats of all nodes """
-        self.send_clear_stats_request(NODENUM_BROADCAST)
+        for node in self.nodes:
+            self.send_clear_stats_request(node)
         self.retry_timeout = time.monotonic()             # set timeout in case we have to retry
         self.state = State.WAIT_STATS_CLEARED             # change state 
 
@@ -303,6 +307,12 @@ class CollectorController():
             offset += 2
         logging.info("=== Stats processing complete ===")
 
+    def send_stats_request_to_all(self):
+        """ send STATS_GET_REQ"""
+        for node in self.nodes:
+            logging.info("send stats request to 0x%x", node)
+            self.send_stats_request(node)
+
     def resend_stats_request(self, destinations:set)-> None:
         """ Resends get_stats_req to the nodes that did not respond """
         for node in destinations:
@@ -343,11 +353,17 @@ class CollectorController():
         elif self.state == State.WAIT_PKGEN_RESP:
             if self.handle_wait_pkgen_resp_state():
                 self.retries = 0
-                self.state = State.PKGEN_SENT
-        elif self.state == State.PKGEN_SENT:
-            self.send_stats_request(NODENUM_BROADCAST)
-            self.retry_timeout = time.monotonic()    # reset the timer in case we retry again
-            self.state = State.WAIT_STATS_RESP 
+                self.stats_timeout = time.monotonic() + STATS_TIMEOUT
+                self.state = State.WAIT_TO_ASK_FOR_STATS
+        elif self.state == State.WAIT_TO_ASK_FOR_STATS:
+            # Wait before requesting stats
+            if time.monotonic() >= self.stats_timeout :
+                self.state = State.ASK_FOR_STATS 
+        elif self.state == State.ASK_FOR_STATS:
+            self.send_stats_request_to_all()
+            self.retry_timeout = time.monotonic()
+            self.retries = 0
+            self.state   =  State.WAIT_STATS_RESP
         elif self.state == State.WAIT_STATS_RESP:
             if self.handle_wait_stats_resp():
                 self.retries = 0
@@ -415,5 +431,5 @@ if(__name__ == "__main__"):
         print("Choose Scenario: disaster_reponse or hiking")
     scenario   = sys.argv[1]
     controller = CollectorController(scenario)
-    controller.clear_stats_broadcast()
+    controller.send_clear_stats_to_all()
     controller.run()    
