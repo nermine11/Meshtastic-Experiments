@@ -12,7 +12,6 @@ from enum import Enum, auto
 # -------------------------------------------------------
 # Logging configuration
 # -------------------------------------------------------
-
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -53,7 +52,7 @@ class State(Enum):
 
 # -------------------------------------------------------
 # Packet types used in the protocol
-# -------------------------------------------------------s
+# -------------------------------------------------------
 
 class PacketType(Enum):
     PKGEN_CONFIG_REQ        = 0X01 
@@ -113,7 +112,6 @@ class CollectorController():
         This clears statistics, response tracking,
         retry counters and timeouts.
         """
-        self.received_packets                = Queue()
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
         self.stats_timeout                   = 0
@@ -153,19 +151,12 @@ class CollectorController():
         portnum = decoded.get("portnum")
         if portnum != "PRIVATE_APP":
             return
-        self.received_packets.put(packet)
+        # process packet immediately
+        self.process_packet(packet)
 
     # ---------------------------------------------------
-    # Process received packets
+    # Process a received packet
     # ---------------------------------------------------
-    def process_all_packets(self) -> None:
-        """ Process all packets currently in the queue """
-        while True:
-            try:
-                packet = self.packet_queue.get_nowait()
-            except queue.Empty:
-                break
-        self.process_packet(packet)
 
     def process_packet(self, packet) -> None:
         """ processes the packets by calling the corresponding function"""
@@ -175,9 +166,11 @@ class CollectorController():
             return
         pkttype = payload[0]
         packet_source = self.convert_id_to_hex(packet["fromId"])
+        # STATS_CLEAR_RESP
         if pkttype == PacketType.STATS_CLEAR_RESP.value:
             self.stats_cleared_nodes.add(packet_source)
             logging.info("Received clear response from 0x%x", packet_source) 
+        # PKGEN_CONFIG_RESP
         elif pkttype == PacketType.PKGEN_CONFIG_RESP.value:
             logging.info("Received PKGEN response %d from 0x%x", payload[1], 
             packet_source)    
@@ -186,6 +179,7 @@ class CollectorController():
             else:
                 logging.warning("Unexpected cmdid from 0x%x should be %d", packet_source, 
                 self.sent_pkgen_cmdids[packet_source])
+        # STATS_GET_RESP
         elif pkttype == PacketType.STATS_GET_RESP.value:
             logging.info("Received stats %d from 0x%x", payload[1], 
             packet_source)    
@@ -260,16 +254,14 @@ class CollectorController():
     # ---------------------------------------------------
     # Retry Timer
     # ---------------------------------------------------
-
     def check_retry_timeout(self) -> bool:
         """ check if it is time to stop waiting for responses from all nodes"""
         current_time = time.monotonic()
         return current_time - self.retry_timeout >= RETRY_TIMEOUT
-
+    
     # ---------------------------------------------------
     # Clear stats
     # ---------------------------------------------------
-
     def send_clear_stats_to_all(self) -> None:
         """ Sends request to clear the stats of all nodes """
         for node in self.nodes:
@@ -301,7 +293,7 @@ class CollectorController():
             return False
         if self.retries >= MAX_RETRIES :
             logging.warning(" Max number of retries exceeded, exiting the program...")
-            exit()
+            sys.exit()
 
     # ---------------------------------------------------
     # PKGEN
@@ -330,7 +322,7 @@ class CollectorController():
             return False
         if self.retries >= MAX_RETRIES :
             logging.warning(" Max number of retries exceeded, exiting the program...")
-            exit()
+            sys.exit()
 
     # ---------------------------------------------------
     # STATS
@@ -401,12 +393,12 @@ class CollectorController():
             return False
         if self.retries >= MAX_RETRIES_STATS :
             logging.warning(" Max number of retries exceeded, exiting the program...")
-            exit()
+            sys.exit()
 
     # ---------------------------------------------------
     # State machine update
     # ---------------------------------------------------
-    
+
     def update_state_machine(self) -> None:
         """ Updates the states and call corresponding function """
         if self.state == State.WAIT_STATS_CLEARED:
@@ -438,7 +430,7 @@ class CollectorController():
                 self.state = State.SAVE_TO_JSON
         elif self.state == State.SAVE_TO_JSON:
             self.save_to_json("stats.json")
-            exit()
+            sys.exit()
     
     # ---------------------------------------------------
     # Save to json
@@ -495,13 +487,13 @@ class CollectorController():
     # ---------------------------------------------------
     def run(self) -> None:
         while True:
-            self.process_all_packets()
             self.update_state_machine()
             time.sleep(0.05)
 
 # -------------------------------------------------------
 # Program entry point
 # -------------------------------------------------------
+
 if(__name__ == "__main__"):
     if(len(sys.argv) < 2):
         print("Choose Scenario: disaster_response or hiking")
