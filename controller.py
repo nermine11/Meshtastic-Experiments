@@ -160,12 +160,9 @@ class CollectorController():
     # ---------------------------------------------------
     def process_all_packets(self) -> None:
         """ Process all packets currently in the queue """
-        while True:
-            try:
-                packet = self.packet_queue.get_nowait()
-            except queue.Empty:
-                break
-        self.process_packet(packet)
+        while not self.received_packets.empty():
+            packet = self.received_packets.get()
+            self.process_packet(packet)
 
     def process_packet(self, packet) -> None:
         """ processes the packets by calling the corresponding function"""
