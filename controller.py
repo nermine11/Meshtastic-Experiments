@@ -29,9 +29,9 @@ NODENUM_BROADCAST               = 0xffffffff
 RETRY_TIMEOUT                   = 300         # timeout to retry to check
 MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
-NUMPKT                          = 100
+NUMPKT                          = 50
 PERIOD                          = 60
-STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 1800     
+STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 600     
 CONTROLLER_NODE                 = 0x31c0c4f1
 LEADER_NODE                     = 0x59d388e5
 DISASTER_RESPONSE               = "disaster_response"
@@ -102,6 +102,7 @@ class CollectorController():
         # subscribe to incoming packets
         pub.subscribe(self.on_receive, "meshtastic.receive")
 
+
     # ---------------------------------------------------
     # Reset experiment variables
     # ---------------------------------------------------
@@ -116,7 +117,8 @@ class CollectorController():
         self.received_packets                = Queue()
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
-        self.stats_timeout                   = 0
+        self.stats_timeout                   = time.monotonic() + STATS_TIMEOUT
+
         self.retries                         = 0
         self.stats_cleared_nodes             = set()
         self.pkgen_responded_nodes           = set()
@@ -124,6 +126,7 @@ class CollectorController():
         self.sent_pkgen_cmdids               = {}
         self.num_sent_broadcasts_by_node     = {}
         self.network_stats                   = {}
+        
         for A in self.nodes:
             self.network_stats[A]   = {}
             self.num_sent_broadcasts_by_node[A] = 0
@@ -153,6 +156,8 @@ class CollectorController():
         portnum = decoded.get("portnum")
         if portnum != "PRIVATE_APP":
             return
+        print("got packet",packet)
+        print(time.monotonic())
         self.received_packets.put(packet)
 
     # ---------------------------------------------------
@@ -342,11 +347,9 @@ class CollectorController():
         # 2 bytes num_broadcasts_sent
         self.num_sent_broadcasts_by_node[A] = int.from_bytes(payload[offset: offset + 2], 'little')
         offset +=2
-        for _ in range(len(self.nodes) -1):
+        for _ in range(len(self.devices) -1):
             nodeid = int.from_bytes(payload[offset: offset + 4], 'little')
             offset += 4
-            if(nodeid == A):
-                continue
             # make sure the nested dictionary exists
             if A not in self.network_stats:
                 self.network_stats[A] = {}
@@ -418,11 +421,11 @@ class CollectorController():
         elif self.state == State.WAIT_PKGEN_RESP:
             if self.handle_wait_pkgen_resp_state():
                 self.retries = 0
-                self.stats_timeout = time.monotonic() + STATS_TIMEOUT
                 self.state = State.WAIT_TO_ASK_FOR_STATS
         elif self.state == State.WAIT_TO_ASK_FOR_STATS:
             # Wait before requesting stats
             if time.monotonic() >= self.stats_timeout :
+                logging.info("time to send stats")
                 self.state = State.ASK_FOR_STATS 
         elif self.state == State.ASK_FOR_STATS:
             self.send_stats_request_to_all()
