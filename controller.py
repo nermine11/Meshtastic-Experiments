@@ -31,7 +31,7 @@ MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
 NUMPKT                          = 50
 PERIOD                          = 60
-STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 600     
+STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 900     
 CONTROLLER_NODE                 = 0x31c0c4f1
 LEADER_NODE                     = 0x59d388e5
 DISASTER_RESPONSE               = "disaster_response"
@@ -118,7 +118,7 @@ class CollectorController():
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
         self.stats_timeout                   = time.monotonic() + STATS_TIMEOUT
-
+        logging.info("send stats at %d",self.stats_timeout  )
         self.retries                         = 0
         self.stats_cleared_nodes             = set()
         self.pkgen_responded_nodes           = set()
@@ -156,9 +156,13 @@ class CollectorController():
         portnum = decoded.get("portnum")
         if portnum != "PRIVATE_APP":
             return
-        print("got packet",packet)
-        print(time.monotonic())
-        self.received_packets.put(packet)
+        pkttype = payload[0]
+        if pkttype in(
+            PacketType.STATS_CLEAR_RESP.value,
+            PacketType.PKGEN_CONFIG_RESP.value,
+            PacketType.STATS_GET_RESP.value
+        ):
+            self.received_packets.put(packet)
 
     # ---------------------------------------------------
     # Process received packets
@@ -495,9 +499,12 @@ class CollectorController():
     # ---------------------------------------------------
     def run(self) -> None:
         while True:
-            self.process_all_packets()
-            self.update_state_machine()
-            time.sleep(0.05)
+            try:
+                self.process_all_packets()
+                self.update_state_machine()
+                time.sleep(0.05)
+            except Exception as e:
+                logging.error(f"Error in run() : {e}", exc_info=True)
 
 # -------------------------------------------------------
 # Program entry point
