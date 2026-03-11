@@ -372,8 +372,10 @@ class CollectorController():
             self.network_stats[A][nodeid].num_pkgen_data_received_broadcasts = int.from_bytes(payload[offset: offset + 2], 'little')
             offset += 2
             #2 bytes rtt                
-            self.network_stats[A][nodeid].rtt = int.from_bytes(payload[offset: offset + 2], 'little')
+            rtt_sum = int.from_bytes(payload[offset: offset + 2], 'little')
             offset += 2
+            count = self.network_stats[A][nodeid].num_pkgen_reply_received
+            self.network_stats[A][nodeid].rtt_avg = rtt_sum / count if count > 0 else 0.0
         logging.info("=== Stats processing complete ===")
 
     def send_stats_request_to_all(self):
