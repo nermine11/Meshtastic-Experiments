@@ -509,7 +509,7 @@ class CollectorController():
             if self.handle_wait_stats_resp():
                 self.state = State.SAVE_TO_JSON
         elif self.state == State.SAVE_TO_JSON:
-            self.save_to_json("stats.json")
+            self.save_to_json("data/stats.json")
             exit()
     
     # ---------------------------------------------------
