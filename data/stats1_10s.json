@@ -1,0 +1,772 @@
+{
+    "1391039350": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            }
+        ]
+    },
+    "1227105360": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            }
+        ]
+    },
+    "3214103652": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            }
+        ]
+    },
+    "1833769890": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 1,
+                "num_pkgen_reply_received": 1,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 1,
+                "rtt": 25455.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "2458335390": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 1,
+                "num_pkgen_reply_received": 1,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 1,
+                "rtt": 20201.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "871882989": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 1,
+                "num_pkgen_reply_received": 1,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 1,
+                "rtt": 15429.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "2446794159": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 1,
+                "num_pkgen_reply_received": 1,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 1,
+                "rtt": 26786.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "2057312131": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 1,
+                "num_pkgen_reply_received": 1,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 1,
+                "rtt": 9418.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "1507035365": {
+        "num_broadcasts_sent": 1,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 1,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 1,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 1,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 1,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 1,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            },
+            {
+                "neighbor": 834716913,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0.0
+            }
+        ]
+    },
+    "834716913": {
+        "num_broadcasts_sent": 0,
+        "links": [
+            {
+                "neighbor": 1391039350,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1227105360,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 3214103652,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1833769890,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2458335390,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 871882989,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2446794159,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 2057312131,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            },
+            {
+                "neighbor": 1507035365,
+                "num_pkgen_data_sent": 0,
+                "num_pkgen_reply_received": 0,
+                "num_pkgen_data_received_dm": 0,
+                "num_pkgen_data_received_broadcasts": 0,
+                "rtt": 0
+            }
+        ]
+    }
+}

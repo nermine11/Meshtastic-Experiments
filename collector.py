@@ -29,9 +29,9 @@ NODENUM_BROADCAST               = 0xffffffff
 RETRY_TIMEOUT                   = 300         # timeout to retry to check
 MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
-NUMPKT                          = 50
-PERIOD                          = 60
-STATS_TIMEOUT                   = NUMPKT * PERIOD + 600     
+NUMPKT                          = 1
+PERIOD                          = 10
+STATS_TIMEOUT                   = NUMPKT * PERIOD + 180     
 CONTROLLER_NODE                 = 0x31c0c4f1
 LEADER_NODE                     = 0x59d388e5
 DISASTER_RESPONSE               = "disaster_response"
@@ -122,7 +122,6 @@ class CollectorController():
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
         self.stats_timeout                   = time.monotonic() + STATS_TIMEOUT
-        logging.info("send stats at %d",self.stats_timeout  )
         self.stats_cleared_nodes             = set()
         self.pkgen_responded_nodes           = set()
         self.stats_responded_nodes           = set()
@@ -191,6 +190,7 @@ class CollectorController():
     def process_packet(self, packet) -> None:
         """ processes the packets by calling the corresponding function"""
         # we received stats_response
+        payload = packet["decoded"].get("payload")
         pkttype = payload[0]
         packet_source = self.convert_id_to_hex(packet["fromId"])
         if pkttype == PacketType.STATS_CLEAR_RESP.value:
@@ -279,7 +279,6 @@ class CollectorController():
         node = self.nodes[self.clear_node_index]
         self.send_clear_stats_request(node)
         self.retry_timeout = time.monotonic()
-        logging.info("waiting for node 0x%x to clear", node)
 
     def send_clear_stats_to_all(self)->None:
         """ Start sequential clear process with first node """
@@ -298,7 +297,6 @@ class CollectorController():
         current_node = self.nodes[self.clear_node_index]
         # current node to be cleared has been cleared, so move on to clear next node
         if current_node in self.stats_cleared_nodes:
-            logging.info("node 0x%x cleared", current_node)
             self.clear_node_index +=1
             self.clear_retries     =0
             if self.clear_node_index < len(self.nodes):
@@ -336,7 +334,6 @@ class CollectorController():
             self.send_pkgen_request(node, cmdid, LEADER_NODE, True,
             PERIOD, NUMPKT)
         self.retry_timeout = time.monotonic()
-        logging.info("waiting for node 0x%x to send pkgen response", node)
 
     def _send_pkgen_request_to_current_node_hiking(self)-> None:
         """ Send PKGEN request to current node """
@@ -352,7 +349,6 @@ class CollectorController():
             self.send_pkgen_request(node, cmdid, self.nodes[i + 1], True,            
             PERIOD, NUMPKT)  
         self.retry_timeout = time.monotonic()
-        logging.info("waiting for node 0x%x to send pkgen response", node)
 
     def send_pkgen_request_per_scenario(self)->None:
         """ Start sequential clear process with first node """
@@ -372,7 +368,6 @@ class CollectorController():
         current_node = self.nodes[self.pkgen_node_index]
         # current node to be cleared has been cleared, so move on to clear next node
         if current_node in self.pkgen_responded_nodes:
-            logging.info("node 0x%x sent PKGEN_CONFIG_RESP", current_node)
             self.pkgen_node_index +=1
             self.pkgen_retries     =0
             if self.pkgen_node_index < len(self.nodes):
@@ -461,7 +456,6 @@ class CollectorController():
         current_node = self.nodes[self.stats_node_index]
         # current node to be cleared has been cleared, so move on to clear next node
         if current_node in self.stats_responded_nodes:
-            logging.info("node 0x%x sent stats", current_node)
             self.stats_node_index +=1
             self.stats_retries     =0
             if self.stats_node_index < len(self.nodes):
@@ -582,5 +576,6 @@ if(__name__ == "__main__"):
         print("Choose Scenario: disaster_response or hiking")
     scenario   = sys.argv[1]
     controller = CollectorController(scenario)
+    print(controller.received_packets.qsize())
     controller.send_clear_stats_to_all()
     controller.run()    
