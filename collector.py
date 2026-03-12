@@ -12,6 +12,7 @@ from enum import Enum, auto
 # -------------------------------------------------------
 # Logging configuration
 # -------------------------------------------------------
+
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -28,9 +29,9 @@ NODENUM_BROADCAST               = 0xffffffff
 RETRY_TIMEOUT                   = 300         # timeout to retry to check
 MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
-NUMPKT                          = 100
+NUMPKT                          = 50
 PERIOD                          = 60
-STATS_TIMEOUT                   = NUMPKT * PERIOD + 600 + 1800     
+STATS_TIMEOUT                   = NUMPKT * PERIOD + 600     
 CONTROLLER_NODE                 = 0x31c0c4f1
 LEADER_NODE                     = 0x59d388e5
 DISASTER_RESPONSE               = "disaster_response"
@@ -52,7 +53,7 @@ class State(Enum):
 
 # -------------------------------------------------------
 # Packet types used in the protocol
-# -------------------------------------------------------
+# -------------------------------------------------------s
 
 class PacketType(Enum):
     PKGEN_CONFIG_REQ        = 0X01 
@@ -75,7 +76,7 @@ class LinkStats:
     num_pkgen_reply_received:int            = 0
     num_pkgen_data_received_dm:int          = 0
     num_pkgen_data_received_broadcasts:int  = 0  
-    rtt:int                                 = 0
+    rtt:float                               = 0
 
 # -------------------------------------------------------
 # Collector Controller
@@ -93,13 +94,18 @@ class CollectorController():
         0x31c0c4f1]
         self.scenario   = scenario
         # nodes participating in the experiment
-        self.nodes      = self.devices[3:9]
+        self.nodes = self.devices
+        if scenario == DISASTER_RESPONSE:
+            self.nodes      = self.devices[3:9]
+        elif scenario == HIKING:
+            self.nodes = self.devices[0:9]
         # Meshtastic serial interface
         self.interface  = meshtastic.serial_interface.SerialInterface()
         # initialize internal variables
         self.reset()
         # subscribe to incoming packets
         pub.subscribe(self.on_receive, "meshtastic.receive")
+
 
     # ---------------------------------------------------
     # Reset experiment variables
@@ -112,21 +118,32 @@ class CollectorController():
         This clears statistics, response tracking,
         retry counters and timeouts.
         """
+        self.received_packets                = Queue()
         self.state                           = State.IDLE
         self.retry_timeout                   = 0
-        self.stats_timeout                   = 0
-        self.retries                         = 0
+        self.stats_timeout                   = time.monotonic() + STATS_TIMEOUT
+        logging.info("send stats at %d",self.stats_timeout  )
         self.stats_cleared_nodes             = set()
         self.pkgen_responded_nodes           = set()
         self.stats_responded_nodes           = set()
         self.sent_pkgen_cmdids               = {}
         self.num_sent_broadcasts_by_node     = {}
         self.network_stats                   = {}
-        for A in self.nodes:
+        
+        self.clear_node_index                = 0
+        self.clear_retries                   = 0
+
+        self.pkgen_node_index                = 0
+        self.pkgen_retries                   = 0
+
+        self.stats_node_index                = 0
+        self.stats_retries                   = 0
+
+        for A in self.devices:
             self.network_stats[A]   = {}
             self.num_sent_broadcasts_by_node[A] = 0
             self.sent_pkgen_cmdids[A] = -1
-            for B in self.nodes:
+            for B in self.devices:
                 if B == A:
                     continue
                 self.network_stats[A][B] = LinkStats()
@@ -151,26 +168,34 @@ class CollectorController():
         portnum = decoded.get("portnum")
         if portnum != "PRIVATE_APP":
             return
-        # process packet immediately
-        self.process_packet(packet)
-
-    # ---------------------------------------------------
-    # Process a received packet
-    # ---------------------------------------------------
-
-    def process_packet(self, packet) -> None:
-        """ processes the packets by calling the corresponding function"""
-        # we received stats_response
         payload = packet["decoded"].get("payload")
         if(not payload or len(payload) < 1):
             return
         pkttype = payload[0]
+        if pkttype in(
+            PacketType.STATS_CLEAR_RESP.value,
+            PacketType.PKGEN_CONFIG_RESP.value,
+            PacketType.STATS_GET_RESP.value
+        ):
+            self.received_packets.put(packet)
+
+    # ---------------------------------------------------
+    # Process received packets
+    # ---------------------------------------------------
+    def process_all_packets(self) -> None:
+        """ Process all packets currently in the queue """
+        while not self.received_packets.empty():
+            packet = self.received_packets.get()
+            self.process_packet(packet)
+
+    def process_packet(self, packet) -> None:
+        """ processes the packets by calling the corresponding function"""
+        # we received stats_response
+        pkttype = payload[0]
         packet_source = self.convert_id_to_hex(packet["fromId"])
-        # STATS_CLEAR_RESP
         if pkttype == PacketType.STATS_CLEAR_RESP.value:
             self.stats_cleared_nodes.add(packet_source)
             logging.info("Received clear response from 0x%x", packet_source) 
-        # PKGEN_CONFIG_RESP
         elif pkttype == PacketType.PKGEN_CONFIG_RESP.value:
             logging.info("Received PKGEN response %d from 0x%x", payload[1], 
             packet_source)    
@@ -179,7 +204,6 @@ class CollectorController():
             else:
                 logging.warning("Unexpected cmdid from 0x%x should be %d", packet_source, 
                 self.sent_pkgen_cmdids[packet_source])
-        # STATS_GET_RESP
         elif pkttype == PacketType.STATS_GET_RESP.value:
             logging.info("Received stats %d from 0x%x", payload[1], 
             packet_source)    
@@ -229,20 +253,6 @@ class CollectorController():
                 wantAck=False)
         logging.info("Sent pkgen request to 0x%x ", destination)
 
-    def send_pkgen_request_disaster_response(self, period: int, numpkt:int)-> None:
-        cmdid = 0
-        for node in self.nodes:
-            cmdid += 1
-            # leader node broadcasts 
-            if node == LEADER_NODE:
-                self.send_pkgen_request(node, cmdid, NODENUM_BROADCAST, False,            
-                period, numpkt)
-            else:
-                # other nodes send DMs to the leader node
-                self.send_pkgen_request(node, cmdid, LEADER_NODE, True,
-                period, numpkt)
-            self.sent_pkgen_cmdids[node] = cmdid   # save the cmdid of each node
-
     def send_stats_request(self, destination):
         """ send STATS_GET_REQ"""
         payload = bytes([PacketType.STATS_GET_REQ.value])
@@ -254,75 +264,140 @@ class CollectorController():
     # ---------------------------------------------------
     # Retry Timer
     # ---------------------------------------------------
+
     def check_retry_timeout(self) -> bool:
         """ check if it is time to stop waiting for responses from all nodes"""
         current_time = time.monotonic()
         return current_time - self.retry_timeout >= RETRY_TIMEOUT
-    
+
     # ---------------------------------------------------
     # Clear stats
     # ---------------------------------------------------
-    def send_clear_stats_to_all(self) -> None:
-        """ Sends request to clear the stats of all nodes """
-        for node in self.nodes:
-            self.send_clear_stats_request(node)
-        self.retry_timeout = time.monotonic()             # set timeout in case we have to retry
-        self.state = State.WAIT_STATS_CLEARED             # change state 
 
-    def resend_clear_stats(self, destinations: set) -> None:
-        """ Resends request to clear the stats of non cleared noded """
-        for node in destinations:
-            logging.info("Resend clear request to 0x%x", node)
-            self.send_clear_stats_request(node)
+    def _send_clear_stats_to_current_node(self) -> None:
+        """ Sends request to clear the stats of all nodes """
+        node = self.nodes[self.clear_node_index]
+        self.send_clear_stats_request(node)
+        self.retry_timeout = time.monotonic()
+        logging.info("waiting for node 0x%x to clear", node)
+
+    def send_clear_stats_to_all(self)->None:
+        """ Start sequential clear process with first node """
+        self.clear_node_index = 0
+        self.clear_retries    = 0
+        self._send_clear_stats_to_current_node()
+        self.state = State.WAIT_STATS_CLEARED
 
     def handle_wait_stats_cleared_state(self) -> bool:
         """ Handles the WAIT_STATS_CLEARED state """
         # All nodes have been cleared
-        if self.stats_cleared_nodes == set(self.nodes):
+        if self.clear_node_index >= len(self.nodes):
             logging.info("All nodes cleared")
             self.reset()
             return True
-        #Not all nodes answered so retry again asking to clear stats after timeout
-        if self.check_retry_timeout() and self.retries < MAX_RETRIES:
-            self.retries += 1
-            logging.info("Not All nodes cleared, num retries left %d ", MAX_RETRIES - self.retries )
-            # who did not answer
-            non_cleared_nodes = set(self.nodes) - self.stats_cleared_nodes
-            self.resend_clear_stats(non_cleared_nodes)
-            self.retry_timeout = time.monotonic()
+        current_node = self.nodes[self.clear_node_index]
+        # current node to be cleared has been cleared, so move on to clear next node
+        if current_node in self.stats_cleared_nodes:
+            logging.info("node 0x%x cleared", current_node)
+            self.clear_node_index +=1
+            self.clear_retries     =0
+            if self.clear_node_index < len(self.nodes):
+                self._send_clear_stats_to_current_node()
             return False
-        if self.retries >= MAX_RETRIES :
-            logging.warning(" Max number of retries exceeded, exiting the program...")
-            sys.exit()
+        # current_node did not answer so retry again asking to clear stats after timeout
+        elif self.check_retry_timeout():
+            if self.clear_retries < MAX_RETRIES:
+                self.clear_retries += 1
+                logging.info("node 0x%x did not clear, num retries left %d ",current_node, MAX_RETRIES - self.clear_retries)
+                # who did not answer
+                self._send_clear_stats_to_current_node()
+                return False
+            elif self.clear_retries >= MAX_RETRIES :
+                logging.warning(" Max number of retries exceeded, exiting the program...")
+                sys.exit()
+        else:
+            return False
 
     # ---------------------------------------------------
     # PKGEN
     # ---------------------------------------------------
 
-    def resend_pkgen(self, destinations: set, destination:int, do_reply: bool,
-    period: int, numpkt:int) -> None:
-        for node in destinations:
-            cmdid = self.sent_pkgen_cmdids[node]
-            self.send_pkgen_request(node, cmdid, destination,
-            do_reply, period, numpkt)
+    def _send_pkgen_request_to_current_node_disaster_response(self)-> None:
+        """ Send PKGEN request to current node """
+        node = self.nodes[self.pkgen_node_index]
+        # cmdid is node index
+        cmdid = self.pkgen_node_index
+        self.sent_pkgen_cmdids[node] = cmdid   # save the cmdid of each node
+        if node == LEADER_NODE:
+            self.send_pkgen_request(node, cmdid, NODENUM_BROADCAST, False,            
+            PERIOD, NUMPKT)
+        else:
+            # other nodes send DMs to the leader node
+            self.send_pkgen_request(node, cmdid, LEADER_NODE, True,
+            PERIOD, NUMPKT)
+        self.retry_timeout = time.monotonic()
+        logging.info("waiting for node 0x%x to send pkgen response", node)
 
+    def _send_pkgen_request_to_current_node_hiking(self)-> None:
+        """ Send PKGEN request to current node """
+        node = self.nodes[self.pkgen_node_index]
+        # cmdid is node index
+        cmdid = self.pkgen_node_index
+        self.sent_pkgen_cmdids[node] = cmdid   # save the cmdid of each node
+        i = self.pkgen_node_index
+        if(i == len(self.nodes) - 1):
+            self.send_pkgen_request(node, cmdid, self.nodes[0], True,            
+            PERIOD, NUMPKT)
+        else:
+            self.send_pkgen_request(node, cmdid, self.nodes[i + 1], True,            
+            PERIOD, NUMPKT)  
+        self.retry_timeout = time.monotonic()
+        logging.info("waiting for node 0x%x to send pkgen response", node)
+
+    def send_pkgen_request_per_scenario(self)->None:
+        """ Start sequential clear process with first node """
+        self.pkgen_node_index = 0
+        self.pkgen_retries    = 0
+        if self.scenario == DISASTER_RESPONSE:
+            self._send_pkgen_request_to_current_node_disaster_response()
+        elif self.scenario == HIKING:
+            self._send_pkgen_request_to_current_node_hiking()
+    
     def handle_wait_pkgen_resp_state(self) -> bool:
-        """ Configure PKGEN on all nodes (not routers) """
-        # All nodes sent back PKGEN_CONFIG_RESP
-        if self.pkgen_responded_nodes == set(self.nodes):
+        """ Handles the WAIT_STATS_CLEARED state """
+        # All nodes have been cleared
+        if self.pkgen_node_index >= len(self.nodes):
             logging.info("All nodes sent back PKGEN_CONFIG_RESP")
             return True
-        #Not all nodes answered so retry again sending PKGEN
-        if self.check_retry_timeout() and self.retries < MAX_RETRIES:
-            self.retries += 1
-            logging.info("Not All nodes sent back PKGEN_CONFIG_RESP, num retries left %d ", MAX_RETRIES - self.retries )
-            non_responded_nodes = set(self.nodes) - self.pkgen_responded_nodes
-            self.resend_pkgen(non_responded_nodes, LEADER_NODE, True, PERIOD, NUMPKT)
-            self.retry_timeout = time.monotonic()
+        current_node = self.nodes[self.pkgen_node_index]
+        # current node to be cleared has been cleared, so move on to clear next node
+        if current_node in self.pkgen_responded_nodes:
+            logging.info("node 0x%x sent PKGEN_CONFIG_RESP", current_node)
+            self.pkgen_node_index +=1
+            self.pkgen_retries     =0
+            if self.pkgen_node_index < len(self.nodes):
+                if self.scenario == DISASTER_RESPONSE:
+                    self._send_pkgen_request_to_current_node_disaster_response()
+                elif self.scenario == HIKING:
+                    self._send_pkgen_request_to_current_node_hiking()
             return False
-        if self.retries >= MAX_RETRIES :
-            logging.warning(" Max number of retries exceeded, exiting the program...")
-            sys.exit()
+        # current_node did not answer so retry again asking to clear stats after timeout
+        if self.check_retry_timeout():
+            if self.pkgen_retries < MAX_RETRIES:
+                self.pkgen_retries += 1
+                logging.info("node 0x%x did not send PKGEN_CONFIG_RESP, num retries left %d ",current_node, MAX_RETRIES - self.pkgen_retries)
+                # send again
+                if self.pkgen_node_index < len(self.nodes):
+                    if self.scenario == DISASTER_RESPONSE:
+                        self._send_pkgen_request_to_current_node_disaster_response()
+                    elif self.scenario == HIKING:
+                        self._send_pkgen_request_to_current_node_hiking()
+                    return False
+            elif self.pkgen_retries >= MAX_RETRIES :
+                logging.warning(" Max number of retries exceeded, exiting the program...")
+                sys.exit()
+        else:
+            return False
 
     # ---------------------------------------------------
     # STATS
@@ -337,11 +412,9 @@ class CollectorController():
         # 2 bytes num_broadcasts_sent
         self.num_sent_broadcasts_by_node[A] = int.from_bytes(payload[offset: offset + 2], 'little')
         offset +=2
-        for _ in range(len(self.nodes) -1):
+        for _ in range(len(self.devices) -1):
             nodeid = int.from_bytes(payload[offset: offset + 4], 'little')
             offset += 4
-            if(nodeid == A):
-                continue
             # make sure the nested dictionary exists
             if A not in self.network_stats:
                 self.network_stats[A] = {}
@@ -360,77 +433,84 @@ class CollectorController():
             self.network_stats[A][nodeid].num_pkgen_data_received_broadcasts = int.from_bytes(payload[offset: offset + 2], 'little')
             offset += 2
             #2 bytes rtt                
-            self.network_stats[A][nodeid].rtt = int.from_bytes(payload[offset: offset + 2], 'little')
+            rtt_sum = int.from_bytes(payload[offset: offset + 2], 'little')
             offset += 2
+            count = self.network_stats[A][nodeid].num_pkgen_reply_received
+            self.network_stats[A][nodeid].rtt = rtt_sum / count if count > 0 else 0.0
         logging.info("=== Stats processing complete ===")
+
+    def _send_stats_request_to_current_node(self) -> None:
+        """ send STATS_GET_REQ"""
+        node = self.nodes[self.stats_node_index]
+        self.send_stats_request(node)
+        self.retry_timeout = time.monotonic()
+        logging.info("send stats request to 0x%x", node)
 
     def send_stats_request_to_all(self):
         """ send STATS_GET_REQ"""
-        for node in self.nodes:
-            logging.info("send stats request to 0x%x", node)
-            self.send_stats_request(node)
-
-    def resend_stats_request(self, destinations:set)-> None:
-        """ Resends get_stats_req to the nodes that did not respond """
-        for node in destinations:
-            logging.info("Resend stats request to 0x%x", node)
-            self.send_stats_request(node)
+        self.stats_node_index = 0
+        self.stats_retries    = 0
+        self._send_stats_request_to_current_node()
 
     def handle_wait_stats_resp(self) -> bool:
         """ Handles the WAIT_STATS_RESP state """
-        # All nodes sent STATS_GET_RESP
-        if self.stats_responded_nodes == set(self.nodes):
+        # All nodes have been cleared
+        if self.stats_node_index >= len(self.nodes):
             logging.info("All nodes sent their stats")
             return True
-        #Not all nodes answered so retry again asking to send stats after timeout
-        if self.check_retry_timeout() and self.retries < MAX_RETRIES_STATS:
-            self.retries += 1
-            logging.info("Not All nodes sent their, num retries left %d ", MAX_RETRIES_STATS - self.retries )
-            # who did not answer
-            no_stats_nodes = set(self.nodes) - self.stats_responded_nodes
-            self.resend_stats_request(no_stats_nodes)
-            self.retry_timeout = time.monotonic()
+        current_node = self.nodes[self.stats_node_index]
+        # current node to be cleared has been cleared, so move on to clear next node
+        if current_node in self.stats_responded_nodes:
+            logging.info("node 0x%x sent stats", current_node)
+            self.stats_node_index +=1
+            self.stats_retries     =0
+            if self.stats_node_index < len(self.nodes):
+                self._send_stats_request_to_current_node()
             return False
-        if self.retries >= MAX_RETRIES_STATS :
-            logging.warning(" Max number of retries exceeded, exiting the program...")
-            sys.exit()
+        # current_node did not answer so retry again asking to clear stats after timeout
+        if self.check_retry_timeout():
+            if self.stats_retries < MAX_RETRIES:
+                self.stats_retries += 1
+                logging.info("node 0x%x did not send stats, num retries left %d ",current_node, MAX_RETRIES - self.stats_retries)
+                # send STATS_REQ again
+                self._send_stats_request_to_current_node()
+                return False
+            elif self.stats_retries >= MAX_RETRIES :
+                logging.warning(" Max number of retries exceeded, exiting the program...")
+                sys.exit()
+        else:
+            return False
 
     # ---------------------------------------------------
     # State machine update
     # ---------------------------------------------------
-
+    
     def update_state_machine(self) -> None:
         """ Updates the states and call corresponding function """
         if self.state == State.WAIT_STATS_CLEARED:
             if self.handle_wait_stats_cleared_state():
                 self.state = State.STATS_CLEARED 
-                self.retries = 0
         elif self.state == State.STATS_CLEARED:
-            if self.scenario == DISASTER_RESPONSE :
-                self.send_pkgen_request_disaster_response(PERIOD, NUMPKT)
-                self.retry_timeout = time.monotonic()
-                self.state = State.WAIT_PKGEN_RESP
+            self.send_pkgen_request_per_scenario()
+            self.state = State.WAIT_PKGEN_RESP
         elif self.state == State.WAIT_PKGEN_RESP:
             if self.handle_wait_pkgen_resp_state():
-                self.retries = 0
-                self.stats_timeout = time.monotonic() + STATS_TIMEOUT
                 self.state = State.WAIT_TO_ASK_FOR_STATS
         elif self.state == State.WAIT_TO_ASK_FOR_STATS:
             # Wait before requesting stats
             if time.monotonic() >= self.stats_timeout :
+                logging.info("time to send stats")
                 self.state = State.ASK_FOR_STATS 
         elif self.state == State.ASK_FOR_STATS:
             self.send_stats_request_to_all()
             self.retry_timeout = time.monotonic()
-            self.retries = 0
             self.state   =  State.WAIT_STATS_RESP
         elif self.state == State.WAIT_STATS_RESP:
             if self.handle_wait_stats_resp():
-                self.retries = 0
                 self.state = State.SAVE_TO_JSON
         elif self.state == State.SAVE_TO_JSON:
             self.save_to_json("stats.json")
-            sys.exit()
+            exit()
     
     # ---------------------------------------------------
     # Save to json
@@ -459,7 +539,7 @@ class CollectorController():
             }
         """
         output = {}
-        for node in self.nodes:
+        for node in self.devices:
             node_entry = {
                 "num_broadcasts_sent": self.num_sent_broadcasts_by_node.get(node, 0),
                 "links": []
@@ -487,13 +567,16 @@ class CollectorController():
     # ---------------------------------------------------
     def run(self) -> None:
         while True:
-            self.update_state_machine()
-            time.sleep(0.05)
+            try:
+                self.process_all_packets()
+                self.update_state_machine()
+                time.sleep(0.05)
+            except Exception as e:
+                logging.error(f"Error in run() : {e}", exc_info=True)
 
 # -------------------------------------------------------
 # Program entry point
 # -------------------------------------------------------
-
 if(__name__ == "__main__"):
     if(len(sys.argv) < 2):
         print("Choose Scenario: disaster_response or hiking")
