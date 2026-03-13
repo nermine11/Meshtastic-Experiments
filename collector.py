@@ -26,7 +26,7 @@ logging.basicConfig(
 
 PortNum_PRIVATE_APP             = 256
 NODENUM_BROADCAST               = 0xffffffff
-RETRY_TIMEOUT                   = 300         # timeout to retry to check
+RETRY_TIMEOUT                   = 10         # timeout to retry to check
 MAX_RETRIES                     = 3
 MAX_RETRIES_STATS               = 10
 NUMPKT                          = 1

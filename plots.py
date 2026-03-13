@@ -69,12 +69,10 @@ def plot_metric(x, y, labels, ylabel, title, filename=None) -> None:
         else:
             plt.text(xi, yi, f'{yi:.2f}', ha='center', va='bottom', fontsize=9)
     plt.tight_layout()
-    if filename:
-        plt.savefig(filename)
     plt.show()
 
 if __name__ == "__main__":
-    with open('data/stats.json') as f:
+    with open('data/stats1.json') as f:
         data = json.load(f)
     if len(sys.argv) > 1:
         if sys.argv[1] == 'pdr':
